@@ -1,5 +1,6 @@
 package com.jankinwu.ui;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.jankinwu.ws.WebSocketClient;
 import javafx.animation.*;
 import javafx.application.Application;
@@ -8,8 +9,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
@@ -23,18 +26,20 @@ import javafx.util.Duration;
  */
 public class Marquee extends Application {
 
-    private static final double WINDOW_WIDTH = 600;
-    private static final double WINDOW_HEIGHT = 55;
+    private static final double WINDOW_WIDTH = 800;
+    private static final double WINDOW_HEIGHT = 60;
     private static final double FONT_SIZE = 40;
+
+    private static final double AVATAR_SIZE = FONT_SIZE * 1.5; // 调整头像大小
     private double xOffset = 0;
     private double yOffset = 0;
     private Text text;
 
     private TranslateTransition scrollAnimation;
 
-    private static final double SCROLL_SPEED_RATIO = 0.2; // Adjust this value to change the scroll speed
-    private double currentScrollSpeed = WINDOW_WIDTH * SCROLL_SPEED_RATIO;
-
+    private static final double SCROLL_SPEED_RATIO = 6; // Adjust this value to change the scroll speed
+    private double currentScrollSpeed = WINDOW_WIDTH * SCROLL_SPEED_RATIO / 100;
+    private ImageView avatarImageView;
 
     @Override
     public void start(Stage primaryStage) {
@@ -49,14 +54,25 @@ public class Marquee extends Application {
 
 
         // 创建容器用于裁剪文本内容
-        Rectangle clipRect = new Rectangle(WINDOW_WIDTH, WINDOW_HEIGHT);
-        clipRect.setArcWidth(10);
-        clipRect.setArcHeight(10);
+        Circle clipCircle = new Circle(AVATAR_SIZE / 2);
+        clipCircle.setCenterX(AVATAR_SIZE / 2);
+        clipCircle.setCenterY(AVATAR_SIZE / 2);
 
-        // 将文本节点放置在裁剪容器内
-        StackPane textPane = new StackPane(text);
-        textPane.setAlignment(Pos.CENTER);
-        textPane.setClip(clipRect);
+        // 加载头像图片
+        Image avatarImage = new Image("http://oss.jankinwu.com/img/0738ccea15ce36d3623d8d2c3df33a87e950b17a.gif");
+
+        // 创建头像框并设置图片
+        avatarImageView = new ImageView(avatarImage);
+        avatarImageView.setFitWidth(AVATAR_SIZE);
+        avatarImageView.setFitHeight(AVATAR_SIZE);
+        avatarImageView.setPreserveRatio(true);
+        avatarImageView.setClip(clipCircle);
+        avatarImageView.setTranslateX( -AVATAR_SIZE);
+
+        // 将文本节点和头像节点放置在容器内
+        StackPane textPane = new StackPane(avatarImageView, text);
+        textPane.setAlignment(Pos.CENTER_LEFT);
+        textPane.setTranslateX(FONT_SIZE); // 设置文本的偏移量
 
         // 创建根节点并设置场景
         Group root = new Group();
@@ -124,15 +140,15 @@ public class Marquee extends Application {
         // 计算滚动动画的持续时间
         double animationDuration = textWidth / currentScrollSpeed;
         // 创建平移动画，使文本节点水平滚动
-        scrollAnimation = new TranslateTransition(Duration.seconds(animationDuration), text);
+        scrollAnimation = new TranslateTransition(Duration.seconds(animationDuration), textPane);
 //        scrollAnimation.setByX(-textWidth);
-        scrollAnimation.setFromX(WINDOW_WIDTH);
+        scrollAnimation.setFromX(WINDOW_WIDTH + AVATAR_SIZE);
         scrollAnimation.setToX(-textWidth);
         scrollAnimation.setCycleCount(Animation.INDEFINITE);
         scrollAnimation.setAutoReverse(false);
         scrollAnimation.setOnFinished(event -> {
             // 动画结束后重新开始滚动动画
-            scrollAnimation.setFromX(WINDOW_WIDTH);
+            scrollAnimation.setFromX(WINDOW_WIDTH + AVATAR_SIZE);
             scrollAnimation.setToX(-textWidth);
             scrollAnimation.play();
         });
@@ -144,10 +160,31 @@ public class Marquee extends Application {
 
     public void updateText(String message) {
         Platform.runLater(() -> {
-            text.setText(message);
+            JSONObject jsonObject = JSONObject.parseObject(message);
+
+            // Update text content
+            String newText = jsonObject.getString("text");
+            text.setText(newText);
+
+            // Update text style
+            double newFontSize = jsonObject.getDouble("fontSize");
+            String newFill = jsonObject.getString("fill");
+            String newStroke = jsonObject.getString("stroke");
+            String newFontFamily = jsonObject.getString("fontFamily");
+            FontWeight newFontWeight = FontWeight.BOLD; // Assuming all text should be bold
+            Font newFont = Font.font(newFontFamily, newFontWeight, newFontSize);
+            text.setFont(newFont);
+            text.setFill(Color.web(newFill));
+            text.setStroke(Color.web(newStroke));
+
+            // Update avatar image
+            String newAvatarUrl = jsonObject.getString("avatarUrl");
+            Image newAvatarImage = new Image(newAvatarUrl);
+            avatarImageView.setImage(newAvatarImage);
+
             // 获取新文本的宽度
-            Text tempText = new Text(message);
-            tempText.setFont(text.getFont());
+            Text tempText = new Text(newText);
+            tempText.setFont(newFont);
             double newTextWidth = tempText.getLayoutBounds().getWidth();
 
             // 停止滚动动画
@@ -156,7 +193,7 @@ public class Marquee extends Application {
             // 计算滚动动画的时间
             double animationDuration = newTextWidth / currentScrollSpeed;
             // 更新滚动动画的起始位置和结束位置
-            scrollAnimation.setFromX(WINDOW_WIDTH);
+            scrollAnimation.setFromX(WINDOW_WIDTH + AVATAR_SIZE);
             scrollAnimation.setToX(-newTextWidth);
             scrollAnimation.setDuration(Duration.seconds(animationDuration));
 

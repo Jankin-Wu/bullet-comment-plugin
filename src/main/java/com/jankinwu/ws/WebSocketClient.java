@@ -1,5 +1,7 @@
 package com.jankinwu.ws;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.jankinwu.dto.PushMsgDTO;
 import javafx.application.Platform;
 
 import javax.websocket.*;
@@ -27,7 +29,11 @@ public class WebSocketClient{
             container.connectToServer(this, uri);
         } catch (URISyntaxException | DeploymentException | IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("与弹幕-按键映射器连接失败！");
+            Platform.runLater(() -> {
+                if (textUpdater != null) {
+                    textUpdater.accept(assembleMsg("与弹幕-按键映射器连接失败！", "http://oss.jankinwu.com/img/f34e7c310a55b319b1238d6944a98226cefc1764.gif"));
+                }
+            });
         }
     }
 
@@ -38,7 +44,7 @@ public class WebSocketClient{
         sendMessage("Hello, Server!");
         Platform.runLater(() -> {
             if (textUpdater != null) {
-                textUpdater.accept("已成功连接至弹幕-按键映射器！");
+                textUpdater.accept(assembleMsg("已成功连接至弹幕-按键映射器！", "http://oss.jankinwu.com/img/af53b18f8c5494ee023701052af5e0fe99257e26.gif"));
             }
         });
     }
@@ -58,7 +64,7 @@ public class WebSocketClient{
         System.out.println("WebSocket connection closed: " + reason);
         Platform.runLater(() -> {
             if (textUpdater != null) {
-                textUpdater.accept("与弹幕-按键映射器连接中断！");
+                textUpdater.accept(assembleMsg("与弹幕-按键映射器连接中断！请在启动弹幕-按键映射器后重启弹幕插件。", "http://oss.jankinwu.com/img/3cd4202dd42a2834867639175cb5c9ea14cebf63.gif"));
             }
         });
     }
@@ -78,5 +84,17 @@ public class WebSocketClient{
 
     public void setTextUpdater(Consumer<String> textUpdater) {
         this.textUpdater = textUpdater;
+    }
+
+    private String assembleMsg(String msg, String avatarUrl) {
+        PushMsgDTO dto = new PushMsgDTO();
+        dto.setFill("#ffffff");
+        dto.setFontFamily("Source Han Sans");
+        dto.setStroke("#000000");
+        dto.setFontSize("40");
+        dto.setText(msg);
+        dto.setType("shadow");
+        dto.setAvatarUrl(avatarUrl);
+        return JSONObject.toJSONString(dto);
     }
 }
