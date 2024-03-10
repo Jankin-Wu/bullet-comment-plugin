@@ -4,6 +4,7 @@ module com.jankinwu {
     requires javax.websocket.api;
     requires com.alibaba.fastjson2;
     requires lombok;
+    requires javafx.graphics;
 
     opens com.jankinwu.ui to javafx.graphics;
     opens com.jankinwu to javafx.fxml;
@@ -11,5 +12,4 @@ module com.jankinwu {
     exports com.jankinwu.ws;
     exports com.jankinwu;
     exports com.jankinwu.dto;
-    requires javafx.graphics;
 }

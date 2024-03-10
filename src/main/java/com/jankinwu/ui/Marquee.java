@@ -1,6 +1,7 @@
 package com.jankinwu.ui;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.jankinwu.dto.PushMsgDTO;
 import com.jankinwu.ws.WebSocketClient;
 import javafx.animation.*;
 import javafx.application.Application;
@@ -34,6 +35,8 @@ public class Marquee extends Application {
     private double xOffset = 0;
     private double yOffset = 0;
     private Text text;
+
+    private static WebSocketClient webSocketClient;
 
     private TranslateTransition scrollAnimation;
 
@@ -127,12 +130,11 @@ public class Marquee extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         try {
-            WebSocketClient webSocketClient = new WebSocketClient("ws://localhost:8080/websocket/plugin/1");
+            webSocketClient = new WebSocketClient("ws://localhost:8080/websocket/plugin/1");
             webSocketClient.setTextUpdater(this::updateText);
         } catch (Exception e) {
-            updateText(e.getMessage());
+            updateText(assembleMsg(e.getMessage(), "http://oss.jankinwu.com/img/3cd4202dd42a2834867639175cb5c9ea14cebf63.gif"));
         }
-
         // 获取文本的宽度
         Text tempText = new Text(text.getText());
         tempText.setFont(text.getFont());
@@ -156,6 +158,14 @@ public class Marquee extends Application {
         // 开始滚动动画
         scrollAnimation.play();
 
+    }
+
+    @Override
+    public void stop() throws Exception {
+        // 调用Platform.exit()退出JavaFX应用
+        Platform.exit();
+        // 使用System.exit(0)退出整个应用程序
+        System.exit(0);
     }
 
     public void updateText(String message) {
@@ -200,6 +210,22 @@ public class Marquee extends Application {
             // 开始滚动动画
             scrollAnimation.play();
         });
+    }
+
+    private String assembleMsg(String msg, String avatarUrl) {
+        PushMsgDTO dto = new PushMsgDTO();
+        dto.setFill("#ffffff");
+        dto.setFontFamily("Source Han Sans");
+        dto.setStroke("#000000");
+        dto.setFontSize("40");
+        dto.setText(msg);
+        dto.setType("shadow");
+        dto.setAvatarUrl(avatarUrl);
+        return JSONObject.toJSONString(dto);
+    }
+
+    public static void main(String[] args) {
+        launch(Marquee.class);
     }
 
 }
