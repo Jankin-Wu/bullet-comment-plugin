@@ -129,12 +129,7 @@ public class Marquee extends Application {
         scene.setFill(Color.TRANSPARENT);
         primaryStage.setScene(scene);
         primaryStage.show();
-        try {
-            webSocketClient = new WebSocketClient("ws://localhost:8080/websocket/plugin/1");
-            webSocketClient.setTextUpdater(this::updateText);
-        } catch (Exception e) {
-            updateText(assembleMsg(e.getMessage(), "http://oss.jankinwu.com/img/3cd4202dd42a2834867639175cb5c9ea14cebf63.gif"));
-        }
+
         // 获取文本的宽度
         Text tempText = new Text(text.getText());
         tempText.setFont(text.getFont());
@@ -157,7 +152,12 @@ public class Marquee extends Application {
 
         // 开始滚动动画
         scrollAnimation.play();
-
+        try {
+            webSocketClient = new WebSocketClient("ws://localhost:8080/websocket/plugin/1");
+            webSocketClient.setTextUpdater(this::updateText);
+        } catch (Exception e) {
+            updateText(assembleMsg(e.getMessage(), "http://oss.jankinwu.com/img/3cd4202dd42a2834867639175cb5c9ea14cebf63.gif"));
+        }
     }
 
     @Override
@@ -224,8 +224,8 @@ public class Marquee extends Application {
         return JSONObject.toJSONString(dto);
     }
 
-    public static void main(String[] args) {
-        launch(Marquee.class);
-    }
+//    public static void main(String[] args) {
+//        launch(Marquee.class);
+//    }
 
 }

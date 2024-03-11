@@ -43,11 +43,6 @@ public class WebSocketClient{
                     textUpdater.accept(assembleMsg("与弹幕-按键映射器连接失败！即将尝试重新连接。。。", "http://oss.jankinwu.com/img/f34e7c310a55b319b1238d6944a98226cefc1764.gif"));
                 }
             });
-            try {
-                Thread.sleep(8000);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
             scheduleReconnect();
         }
     }

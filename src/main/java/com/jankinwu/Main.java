@@ -9,7 +9,7 @@ import javafx.application.Application;
  * @date 
  */
 public class Main {
-//    public static void main(String[] args) {
-//        Application.launch(Marquee.class);
-//    }
+    public static void main(String[] args) {
+        Application.launch(Marquee.class);
+    }
 }
