@@ -40,7 +40,7 @@ public class WebSocketClient{
             e.printStackTrace();
             Platform.runLater(() -> {
                 if (textUpdater != null) {
-                    textUpdater.accept(assembleMsg("与弹幕-按键映射器连接失败！即将尝试重新连接。。。", "http://oss.jankinwu.com/img/f34e7c310a55b319b1238d6944a98226cefc1764.gif"));
+                    textUpdater.accept(assembleMsg("与弹幕-按键映射器连接失败！即将尝试重新连接。。。", "img/wulian.gif"));
                 }
             });
             scheduleReconnect();
@@ -54,7 +54,7 @@ public class WebSocketClient{
         sendMessage("Hello, Server!");
         Platform.runLater(() -> {
             if (textUpdater != null) {
-                textUpdater.accept(assembleMsg("已成功连接至弹幕-按键映射器！", "http://oss.jankinwu.com/img/af53b18f8c5494ee023701052af5e0fe99257e26.gif"));
+                textUpdater.accept(assembleMsg("已成功连接至弹幕-按键映射器！", "/img/cheers.gif"));
             }
         });
     }
@@ -65,7 +65,7 @@ public class WebSocketClient{
         Platform.runLater(() -> {
             if (textUpdater != null) {
                 if ("Hello, Client!".equals(message)) {
-                    textUpdater.accept(assembleMsg("已成功连接至弹幕-按键映射器！", "http://oss.jankinwu.com/img/af53b18f8c5494ee023701052af5e0fe99257e26.gif"));
+                    textUpdater.accept(assembleMsg("已成功连接至弹幕-按键映射器！", "/img/cheers.gif"));
                 } else {
                     textUpdater.accept(message);
                 }
@@ -78,7 +78,7 @@ public class WebSocketClient{
         System.out.println("WebSocket connection closed: " + reason);
         Platform.runLater(() -> {
             if (textUpdater != null) {
-                textUpdater.accept(assembleMsg("与弹幕-按键映射器连接中断！即将尝试重新连接。。。", "http://oss.jankinwu.com/img/3cd4202dd42a2834867639175cb5c9ea14cebf63.gif"));
+                textUpdater.accept(assembleMsg("与弹幕-按键映射器连接中断！即将尝试重新连接。。。", "/img/tiqiang.gif"));
             }
         });
         try {
@@ -138,7 +138,7 @@ public class WebSocketClient{
             e.printStackTrace();
             Platform.runLater(() -> {
                 if (textUpdater != null) {
-                    textUpdater.accept(assembleMsg("与弹幕-按键映射器重新尝试连接失败！", "http://oss.jankinwu.com/img/f34e7c310a55b319b1238d6944a98226cefc1764.gif"));
+                    textUpdater.accept(assembleMsg("与弹幕-按键映射器重新尝试连接失败！", "/img/wulian.gif"));
                 }
             });
         }

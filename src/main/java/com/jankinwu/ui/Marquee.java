@@ -62,7 +62,7 @@ public class Marquee extends Application {
         clipCircle.setCenterY(AVATAR_SIZE / 2);
 
         // 加载头像图片
-        Image avatarImage = new Image("http://oss.jankinwu.com/img/0738ccea15ce36d3623d8d2c3df33a87e950b17a.gif");
+        Image avatarImage = new Image(getImageUrl("/img/prprpr.gif"));
 
         // 创建头像框并设置图片
         avatarImageView = new ImageView(avatarImage);
@@ -70,7 +70,7 @@ public class Marquee extends Application {
         avatarImageView.setFitHeight(AVATAR_SIZE);
         avatarImageView.setPreserveRatio(true);
         avatarImageView.setClip(clipCircle);
-        avatarImageView.setTranslateX( -AVATAR_SIZE);
+        avatarImageView.setTranslateX(-AVATAR_SIZE);
 
         // 将文本节点和头像节点放置在容器内
         StackPane textPane = new StackPane(avatarImageView, text);
@@ -90,7 +90,6 @@ public class Marquee extends Application {
 
 // 将边框添加到根节点
         root.getChildren().add(border);
-
 
 
         primaryStage.initStyle(StageStyle.TRANSPARENT);
@@ -124,7 +123,6 @@ public class Marquee extends Application {
         primaryStage.getIcons().add(icon);
 
 
-
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.TRANSPARENT);
         primaryStage.setScene(scene);
@@ -156,7 +154,7 @@ public class Marquee extends Application {
             webSocketClient = new WebSocketClient("ws://localhost:8080/websocket/plugin/1");
             webSocketClient.setTextUpdater(this::updateText);
         } catch (Exception e) {
-            updateText(assembleMsg(e.getMessage(), "http://oss.jankinwu.com/img/3cd4202dd42a2834867639175cb5c9ea14cebf63.gif"));
+            updateText(assembleMsg(e.getMessage(), "/img/wulian.gif"));
         }
     }
 
@@ -189,7 +187,7 @@ public class Marquee extends Application {
 
             // Update avatar image
             String newAvatarUrl = jsonObject.getString("avatarUrl");
-            Image newAvatarImage = new Image(newAvatarUrl);
+            Image newAvatarImage = new Image(getImageUrl(newAvatarUrl));
             avatarImageView.setImage(newAvatarImage);
 
             // 获取新文本的宽度
@@ -210,6 +208,14 @@ public class Marquee extends Application {
             // 开始滚动动画
             scrollAnimation.play();
         });
+    }
+
+    private String getImageUrl(String imageUrl) {
+
+        if (!imageUrl.startsWith("http")) {
+            imageUrl = Marquee.class.getResource(imageUrl).toString();
+        }
+        return imageUrl;
     }
 
     private String assembleMsg(String msg, String avatarUrl) {
